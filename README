@@ -1,0 +1,132 @@
+TO RUN THIS I USED KERNEL VERSION 5.10.0-32-amd64
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+EXAMPLES ON HOW TO RUN I HAVE LISTED WITHOUT FUSE, WITH HELLO.C(PART 1 FUSE EXAMPLE), MEMEFS.C, AND NO FILE EXIST
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+
+///////////////////////////////////////////////////////////////
+example run with file that i know exists in my vm WITHOUT FUSE:
+cynthia@debian:/usr/src/git2/project-3-cabid1/kernelSpace$ make clean
+make -C /lib/modules/5.10.0-32-amd64/build M=/usr/src/git2/project-3-cabid1/kernelSpace clean
+make[1]: Entering directory '/usr/src/linux-headers-5.10.0-32-amd64'
+  CLEAN   /usr/src/git2/project-3-cabid1/kernelSpace/Module.symvers
+make[1]: Leaving directory '/usr/src/linux-headers-5.10.0-32-amd64'
+cynthia@debian:/usr/src/git2/project-3-cabid1/kernelSpace$ make
+make -C /lib/modules/5.10.0-32-amd64/build M=/usr/src/git2/project-3-cabid1/kernelSpace modules
+make[1]: Entering directory '/usr/src/linux-headers-5.10.0-32-amd64'
+  CC [M]  /usr/src/git2/project-3-cabid1/kernelSpace/hello.o
+  MODPOST /usr/src/git2/project-3-cabid1/kernelSpace/Module.symvers
+  CC [M]  /usr/src/git2/project-3-cabid1/kernelSpace/hello.mod.o
+  LD [M]  /usr/src/git2/project-3-cabid1/kernelSpace/hello.ko
+make[1]: Leaving directory '/usr/src/linux-headers-5.10.0-32-amd64'
+cynthia@debian:/usr/src/git2/project-3-cabid1/kernelSpace$ sudo insmod hello.ko file="/tmp/test.txt"
+cynthia@debian:/usr/src/git2/project-3-cabid1/kernelSpace$ sudo dmesg
+
+FOR READABILITY THIS IS THE LAST ENTRY FROM DMESG AND WHAT TO EXPECT
+[98814.507088] Kernel module loaded.
+cynthia@debian:/usr/src/git2/project-3-cabid1/kernelSpace$ sudo cat /dev/chardevice
+cynthia@debian:/usr/src/git2/project-3-cabid1/kernelSpace$ sudo dmesg
+
+AGAIN FOR READABILITY:
+[99063.648385] Read file contents: hELlo WORLD AHHHHHHHH.
+           	?
+           	?
+
+cynthia@debian:/usr/src/git2/project-3-cabid1/kernelSpace$ sudo rmmod hello
+cynthia@debian:/usr/src/git2/project-3-cabid1/kernelSpace$ sudo dmesg
+AGAIN FOR READABILITY:
+
+[99175.650743] Goodbye Cruel World ahhhhh! Kernel module unloaded.
+cynthia@debian:/usr/src/git2/project-3-cabid1/kernelSpace$
+//////////////////////////////////////////////////////////
+
+
+
+
+////////////////////////////////////////////////////////////////////////////////////////
+EXAMPLE RUN WITH fuseHello.c(this is the fuse example part 1 to check with working fuse):
+cynthia@debian:/usr/src/git2/project-3-cabid1/kernelSpace$ gcc -Wall fuseHello.c `pkg-config fuse3 --cflags --libs` -o fuseHello
+cynthia@debian:/usr/src/git2/project-3-cabid1/kernelSpace$ sudo ./fuseHello /tmp/memefs
+[sudo] password for cynthia:
+cynthia@debian:/usr/src/git2/project-3-cabid1/kernelSpace$ sudo insmod hello.ko file="/tmp/memefs/hello"
+cynthia@debian:/usr/src/git2/project-3-cabid1/kernelSpace$ sudo dmesg
+
+FOR READABILITY THIS IS THE LAST ENTRY FROM DMESG AND WHAT TO EXPECT
+[  464.241366] Kernel module loaded.
+cynthia@debian:/usr/src/git2/project-3-cabid1/kernelSpace$ sudo cat /dev/chardevice
+cynthia@debian:/usr/src/git2/project-3-cabid1/kernelSpace$ sudo dmesg
+
+AGAIN FOR READABILITY:
+[  511.845282] Read file contents: Hello World!
+cynthia@debian:/usr/src/git2/project-3-cabid1/kernelSpace$ sudo rmmod hello
+cynthia@debian:/usr/src/git2/project-3-cabid1/kernelSpace$ sudo dmesg
+
+AGAIN FOR READABILITY:
+
+[  535.174017] Goodbye Cruel World ahhhhh! Kernel module unloaded.
+cynthia@debian:/usr/src/git2/project-3-cabid1/kernelSpace$ make unmount_memefs
+sudo fusermount -u /tmp/memefs
+//////////////////////////////
+
+
+
+
+/////////////////////////////////////////////////////
+EXAMPLE RUN WITH memefs.c(part 1 with hardcoded file):
+cynthia@debian:/usr/src/git2/project-3-cabid1/kernelSpace$ sudo ./memefs myfilesystem.img /tmp/memefs
+Reading blocksssssss 0
+Reading blocksssssss 254
+Reading blocksssssss 239
+cynthia@debian:/usr/src/git2/project-3-cabid1/kernelSpace$ sudo insmod hello.ko file="/tmp/memefs/hello.txt"
+cynthia@debian:/usr/src/git2/project-3-cabid1/kernelSpace$ sudo cat /dev/chardevice
+cynthia@debian:/usr/src/git2/project-3-cabid1/kernelSpace$ sudo dmesg
+LAST MESSAGES FOR READABILITY
+
+[19411.021605] Kernel module loaded.
+[19430.723788] Read file contents: Hello World!
+
+cynthia@debian:/usr/src/git2/project-3-cabid1/kernelSpace$ sudo rmmod hello
+cynthia@debian:/usr/src/git2/project-3-cabid1/kernelSpace$ sudo dmesg
+
+LAST MESSAGES FOR READABILITY
+
+[19483.851490] Goodbye Cruel World ahhhhh! Kernel module unloaded.
+cynthia@debian:/usr/src/git2/project-3-cabid1/kernelSpace$ make unmount_memefs
+sudo fusermount -u /tmp/memefs
+cynthia@debian:/usr/src/git2/project-3-cabid1/kernelSpace$
+////////////////////////////////////////////////////////////
+
+
+
+////////////////////////////////////////////////////////////////
+IF THE FILE DOES NOT EXIST: 
+
+cynthia@debian:/usr/src/git2/project-3-cabid1/kernelSpace$ sudo insmod hello.ko file="/tmp/doesnot/exist.txt"
+cynthia@debian:/usr/src/git2/project-3-cabid1/kernelSpace$ sudo cat /dev/chardevice
+cynthia@debian:/usr/src/git2/project-3-cabid1/kernelSpace$ sudo rmmod hello
+cynthia@debian:/usr/src/git2/project-3-cabid1/kernelSpace$ sudo dmesg
+
+DMESG:
+[  810.583146] File does not exist
+[  810.583150] Error: unable to read the file check file exists
+[  810.583151] Kernel module loaded.
+[  819.777746] Goodbye Cruel World ahhhhh! Kernel module unloaded.
+
+//////////////////////////////////////////////////////////////////
+
+
+
+
+
+
+///////////////////////////////////////////
+sources can be found in comments of hello.c
+
+hello.c is the kernel mod 
+memefs.c is fuse part 1 with hardcoded file
+mkmemefs.c is from last proj
+fuseHello.c is hello.c example from part 1 i used it to check kernel mod with fuse 
+Makefile is the provided Makefile
+///////////////////////////////////////////
+
