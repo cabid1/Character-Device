@@ -4,7 +4,7 @@ sources can be found in comments of hello.c
 hello.c is the kernel mod 
 memefs.c is fuse part 1 with hardcoded file
 mkmemefs.c is from last proj
-fuseHello.c is hello.c example from part 1 i used it to check kernel mod with fuse 
+fuseHello.c comes from https://github.com/libfuse/libfuse/blob/master/example/hello.c
 Makefile is the provided Makefile
 ///////////////////////////////////////////
 
