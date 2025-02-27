@@ -1,3 +1,14 @@
+///////////////////////////////////////////
+sources can be found in comments of hello.c
+
+hello.c is the kernel mod 
+memefs.c is fuse part 1 with hardcoded file
+mkmemefs.c is from last proj
+fuseHello.c is hello.c example from part 1 i used it to check kernel mod with fuse 
+Makefile is the provided Makefile
+///////////////////////////////////////////
+
+
 TO RUN THIS I USED KERNEL VERSION 5.10.0-32-amd64
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -120,13 +131,5 @@ DMESG:
 
 
 
-///////////////////////////////////////////
-sources can be found in comments of hello.c
 
-hello.c is the kernel mod 
-memefs.c is fuse part 1 with hardcoded file
-mkmemefs.c is from last proj
-fuseHello.c is hello.c example from part 1 i used it to check kernel mod with fuse 
-Makefile is the provided Makefile
-///////////////////////////////////////////
 
